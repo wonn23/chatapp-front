@@ -1,58 +1,70 @@
 .input-area {
-    background-color: red;
-    min-height:50px;
-    display: flex;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  }
-  .plus-button{
-    background-color: lightslategray;
-    width: 50px;
-    color:white;
-    font-weight: bold;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-  }
-  
-  .input-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .MuiInput-root{
-    height: 100%;
-    width: 100%;
-    border:none;
-    border-color: white;
-  
-  }
-  
-  
-  input{
-    border:none;
-    width: 100%;
-    height: 100%;
-    padding-left: 5px;
-  }
-  input:focus{
-    outline:none;
-    
-  }
-  
-  .send-button{
-    min-width: 70px;
-    border-radius:0;
-    background-color:#F7E600; 
-    border:none;
-  }
-  .send-button:hover {
-    cursor:pointer;
-  }
-  .send-button:active {
-    background-color: yellow;
-  }
-  
+  background-color: red;
+  height: 50px; /* input-area, plus-button, input-container의 높이를 동일하게 설정 */
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.plus-button {
+  background-color: lightslategray;
+  width: 50px;
+  height: 100%; /* input-area의 높이와 동일하게 설정 */
+  color: white;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  box-sizing: border-box;
+  margin-right: 0px;
+  padding: 0px;
+  border: none;
+}
+
+.input-container {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 50px); /* 플러스 버튼의 너비만큼 차감 */
+  height: 100%; /* input-area의 높이와 동일하게 설정 */
+  padding: 0;
+  margin: 0;
+}
+
+.MuiInput-root {
+  height: 100%; /* input-container와 동일한 높이 */
+  width: 100%;
+  border: none;
+  border-color: white;
+}
+
+input {
+  border: none;
+  width: 100%;
+  height: 100%; /* input-container와 동일한 높이 */
+  padding-left: 5px;
+}
+
+input:focus {
+  outline: none;
+}
+
+.send-button {
+  min-width: 70px;
+  height: 100%; /* input-container와 동일한 높이 */
+  border-radius: 0;
+  background-color: #f7e600;
+  border: none;
+}
+
+.send-button:hover {
+  cursor: pointer;
+}
+
+.send-button:active {
+  background-color: yellow;
+}

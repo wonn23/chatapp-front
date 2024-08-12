@@ -1,17 +1,40 @@
+/* App 전체 컨테이너 */
 .App {
-  height:100vh;
-  background-image: url("../public/background.png");
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 28rem;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
 }
 
+/* 채팅방 목록 스타일 */
+.chat-room-list {
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 20px;
+}
 
+.chat-room-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-/* @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-} */
+.chat-room-item:hover {
+  background-color: #e9e9e9;
+}
 
+/* 로딩 중 스타일 */
+.loading {
+  text-align: center;
+  padding: 10px;
+}
