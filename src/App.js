@@ -1,67 +1,66 @@
+import "./App.css";
 import { useState, useEffect } from "react";
 import ChatRoomList from "./components/ChatRoomList/ChatRoomList";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
-import socket from "./server";
-import "./App.css";
+import Login from "./components/Login/Login.jsx";
+import CreateRoom from "./components/CreateRoom/CreateRoom.jsx";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { io } from "socket.io-client";
 
 function App() {
-  const [chatRooms, setChatRooms] = useState([
-    { _id: 1, name: "ChatRoom 1" },
-    { _id: 2, name: "ChatRoom 2" },
-  ]);
-
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [user, setUser] = useState(null);
+  const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null); // 선택된 방 상태 추가
+  const [socket, setSocket] = useState(null); // 소켓 상태 추가
 
   useEffect(() => {
-    if (!user) {
-      askUserName();
-    }
-  });
+    const newSocket = io(process.env.REACT_APP_BACKEND_URL); // 로그인 전 소켓 생성
+    setSocket(newSocket);
 
-  const loadMoreChatRooms = () => {
-    // 더 많은 채팅방 로드 (무한 스크롤)
-    const newChatRooms = [
-      { _id: chatRooms.length + 1, name: `Chat Room ${chatRooms.length + 1}` },
-    ];
-    setChatRooms([...chatRooms, newChatRooms]);
-  };
+    return () => {
+      if (newSocket) newSocket.disconnect(); // 컴포넌트가 언마운트되면 소켓 연결 해제
+    };
+  }, []);
 
-  const selectChatRoom = (room) => {
-    // 채팅방 선택 시 동작
-    setSelectedRoom(room);
-  };
-
-  const askUserName = () => {
-    const username = prompt("당신의 이름을 입력하세요.");
-
-    if (username) {
-      socket.emit("login", username, (res) => {
-        if (res?.ok) {
-          setUser(res.data);
-        } else {
-          alert("로그인에 실패했습니다. 다시 시도해주세요.");
-          askUserName();
-        }
-      });
-    } else {
-      alert("이름을 입력해야 합니다.");
-      askUserName();
-    }
+  const handleLogin = (user) => {
+    setUsername(user.name);
+    setUserId(user._id); // 유저 ID 설정
+    setIsLoggedIn(true);
   };
 
   return (
-    <div>
-      {selectedRoom ? (
-        <ChatRoom selectedRoom={selectedRoom} user={user} socket={socket} />
-      ) : (
-        <ChatRoomList
-          chatRooms={chatRooms}
-          loadMoreChatRooms={loadMoreChatRooms}
-          selectChatRoom={selectChatRoom}
-        />
-      )}
-    </div>
+    <Router>
+      <div>
+        {!isLoggedIn ? (
+          <Login onLogin={handleLogin} socket={socket} />
+        ) : (
+          <div>
+            <Routes>
+              <Route
+                path="/"
+                element={<ChatRoomList setSelectedRoom={setSelectedRoom} />}
+              />
+              <Route
+                path="/create-room"
+                element={<CreateRoom userId={userId} />}
+              />
+              <Route
+                path="/room/:roomId"
+                element={
+                  <ChatRoom
+                    username={username}
+                    userId={userId}
+                    selectedRoom={selectedRoom} // 선택된 방 전달
+                    socket={socket} // 소켓 전달
+                  />
+                }
+              />
+            </Routes>
+          </div>
+        )}
+      </div>
+    </Router>
   );
 }
 
