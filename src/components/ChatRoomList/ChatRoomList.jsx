@@ -1,39 +1,72 @@
-import { useState, useEffect } from "react";
-import "./ChatRoomList.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ChatRoomListContainer,
+  ChatRoomItem,
+  Loading,
+  CreateRoomButtonContainer,
+  CreateRoomButton,
+} from "./ChatRoomList.styles";
 
-const ChatRoomList = ({ chatRooms, loadMoreChatRooms, selectChatRoom }) => {
-  const [isFetching, setIsFetching] = useState(false);
+function ChatRoomList({ setSelectedRoom }) {
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (isFetching) {
-      loadMoreChatRooms();
-      setIsFetching(false);
-    }
-  }, [isFetching, loadMoreChatRooms]);
+    // 서버에서 채팅방 목록을 가져오는 API 호출
+    const fetchRooms = async () => {
+      try {
+        // 환경변수로 백엔드 URL 사용
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/room`
+        );
+        setRooms(response.data); // JSON 변환이 자동으로 처리됨
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching chat rooms:", error);
+        setLoading(false);
+      }
+    };
 
-  const handleScroll = (e) => {
-    if (
-      e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight &&
-      !isFetching
-    ) {
-      setIsFetching(true);
-    }
+    fetchRooms();
+  }, []);
+
+  const handleCreateRoom = () => {
+    navigate("/create-room"); // 채팅방 생성 페이지로 이동
   };
 
   return (
-    <div className="chat-room-list" onScroll={handleScroll}>
-      {chatRooms.map((room, index) => (
-        <div
-          key={room._id || index}
-          className="chat-room-item"
-          onClick={() => selectChatRoom(room)}
-        >
-          {room.name}
-        </div>
-      ))}
-      {isFetching && <div className="loading">Loading more rooms...</div>}
-    </div>
+    <ChatRoomListContainer>
+      <h2>채팅방 목록</h2>
+
+      <CreateRoomButtonContainer>
+        <CreateRoomButton onClick={handleCreateRoom}>
+          채팅방 생성
+        </CreateRoomButton>
+      </CreateRoomButtonContainer>
+
+      {loading ? (
+        <Loading>로딩 중...</Loading>
+      ) : (
+        <ul>
+          {rooms.map((room) => (
+            <Link
+              to={`/room/${room._id}`}
+              key={room._id}
+              style={{ textDecoration: "none" }}
+            >
+              <ChatRoomItem>
+                <span>{room.title}</span>
+                <span>참여자: {room.participants}</span>
+              </ChatRoomItem>
+            </Link>
+          ))}
+        </ul>
+      )}
+    </ChatRoomListContainer>
   );
-};
+}
 
 export default ChatRoomList;
