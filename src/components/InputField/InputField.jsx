@@ -1,31 +1,30 @@
-import React from 'react'
-import { Input } from "@mui/base/Input";
-import { Button } from "@mui/base/Button";
-import './InputField.css'
-const InputField = ({message,setMessage,sendMessage}) => {
+import React from "react";
+import {
+  InputArea,
+  PlusButton,
+  InputContainer,
+  StyledInput,
+  SendButton,
+} from "./InputField.styles.js";
 
+const InputField = ({ message, setMessage, sendMessage }) => {
   return (
-    <div className="input-area">
-          <div className="plus-button">+</div>
-          <form onSubmit={sendMessage} className="input-container">
-            <Input
-              placeholder="Type in here…"
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              multiline={false}
-              rows={1}
-            />
+    <InputArea>
+      <PlusButton>+</PlusButton>
+      <InputContainer onSubmit={sendMessage}>
+        <StyledInput
+          placeholder="Type in here…"
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          multiline={false}
+          rows={1}
+        />
+        <SendButton type="submit" disabled={message === ""}>
+          전송
+        </SendButton>
+      </InputContainer>
+    </InputArea>
+  );
+};
 
-            <Button
-              disabled={message === ""}
-              type="submit"
-              className="send-button"
-            >
-              전송
-            </Button>
-          </form>
-        </div>
-  )
-}
-
-export default InputField
+export default InputField;

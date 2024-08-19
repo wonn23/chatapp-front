@@ -1,48 +1,51 @@
-.system-message-container {
-  display: flex;
+import styled from "styled-components";
 
+export const SystemMessageContainer = styled.div`
+  display: flex;
   justify-content: center;
   align-items: center;
-}
+`;
 
-.system-message {
+export const SystemMessage = styled.p`
   background-color: #55667758;
   border-radius: 100px;
   text-align: center;
   color: white;
   padding: 2px 15px;
   font-size: 14px;
-}
-.my-message-container {
+`;
+
+export const MyMessageContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-bottom: 5px;
-}
-.my-message {
+`;
+
+export const MyMessage = styled.div`
   background-color: #f7e600;
   border-radius: 8px;
   padding: 8px;
   max-width: 200px;
   font-size: 12px;
-}
+`;
 
-.your-message-container {
+export const YourMessageContainer = styled.div`
   display: flex;
   justify-content: flex-start;
-  /* margin-bottom: 5px; */
   align-items: center;
-}
-.your-message {
+`;
+
+export const YourMessage = styled.div`
   background-color: white;
   border-radius: 8px;
   padding: 8px;
   max-width: 200px;
   font-size: 12px;
-}
+`;
 
-.profile-image {
+export const ProfileImage = styled.img`
   width: 38px;
   height: 38px;
   border-radius: 100px;
   margin-right: 10px;
-}
+`;
