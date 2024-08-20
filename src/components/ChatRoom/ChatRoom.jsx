@@ -2,60 +2,75 @@ import { useState, useEffect } from "react";
 import MessageContainer from "../MessageContainer/MessageContainer";
 import InputField from "../InputField/InputField";
 import { ChatRoomContainer, ChatRoomHeader } from "./ChatRoom.styles";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
-const ChatRoom = ({ selectedRoom, username, userId, socket }) => {
-  const [messageList, setMessageList] = useState([]);
-  const [message, setMessage] = useState("");
+const ChatRoom = ({ socket, user }) => {
+  const { roomId } = useParams(); // 방 ID를 URL에서 가져옴
+  const [messages, setMessages] = useState([]);
+  const [roomInfo, setRoomInfo] = useState(null);
 
   useEffect(() => {
-    if (selectedRoom) {
-      socket.emit("joinRoom", selectedRoom._id);
+    // REST API로 초기 방 정보 가져오기
+    const fetchRoomInfo = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/room/${roomId}`
+        );
+        setRoomInfo(response.data); // 방 정보 설정
 
-      socket.on("roomMessages", (messages) => {
-        setMessageList(messages);
-      });
-    }
+        setMessages(
+          Array.isArray(response.data.messages) ? response.data.messages : []
+        );
+      } catch (error) {
+        console.error("Failed to fetch room info", error);
+      }
+    };
+
+    fetchRoomInfo();
+
+    // 방에 입장
+    socket.emit("joinRoom", roomId);
+
+    // 소켓을 통해 새 메시지를 수신
+    socket.on("message", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
 
     return () => {
-      socket.emit("leaveRoom", selectedRoom._id);
-      socket.off("roomMessages");
+      // 방을 나가면 소켓 이벤트 해제
+      socket.emit("leaveRoom", roomId);
+      socket.off("message");
     };
-  }, [selectedRoom, socket]);
+  }, [roomId, socket]);
 
-  const sendMessage = (event) => {
-    event.preventDefault();
-    if (message.trim() === "") return;
+  const sendMessage = (messageText) => {
+    if (messageText.trim() === "") return;
 
     const newMessage = {
-      user: { _id: userId, name: username },
-      chat: message,
-      roomId: selectedRoom._id,
+      user,
+      text: messageText,
+      roomId,
     };
 
     socket.emit("sendMessage", newMessage, (res) => {
       if (res.ok) {
-        setMessageList([...messageList, newMessage]);
-        setMessage("");
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
       }
     });
   };
 
-  if (!selectedRoom) {
+  if (!roomInfo) {
     return <div>Loading chat room...</div>;
   }
 
   return (
     <ChatRoomContainer>
-      <ChatRoomHeader>{selectedRoom.name}</ChatRoomHeader>
-      <MessageContainer
-        messageList={messageList}
-        user={{ _id: userId, name: username }}
-      />
-      <InputField
-        message={message}
-        setMessage={setMessage}
-        sendMessage={sendMessage}
-      />
+      <ChatRoomHeader>{roomInfo.title}</ChatRoomHeader>
+      {/* 메시지 목록 컴포넌트 */}
+      <MessageContainer messages={messages} user={user} />
+      {/* 메시지 입력 필드 컴포넌트 */}
+      <InputField onSendMessage={sendMessage} />
     </ChatRoomContainer>
   );
 };

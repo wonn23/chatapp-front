@@ -1,17 +1,16 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ChatRoomList from "./components/ChatRoomList/ChatRoomList";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
 import Login from "./components/Login/Login.jsx";
 import CreateRoom from "./components/CreateRoom/CreateRoom.jsx";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
-
+import axios from "axios";
 function App() {
-  const [username, setUsername] = useState("");
-  const [userId, setUserId] = useState("");
+  const [user, setUser] = useState("");
+  const [rooms, setRooms] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null); // 선택된 방 상태 추가
   const [socket, setSocket] = useState(null); // 소켓 상태 추가
 
   useEffect(() => {
@@ -24,9 +23,26 @@ function App() {
   }, []);
 
   const handleLogin = (user) => {
-    setUsername(user.name);
-    setUserId(user._id); // 유저 ID 설정
+    setUser(user);
     setIsLoggedIn(true);
+  };
+
+  // 채팅방 목록을 서버에서 받아오는 함수
+  const fetchRooms = useCallback(async () => {
+    try {
+      // 환경변수로 백엔드 URL 사용
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/room`
+      );
+      setRooms(response.data); // 서버에서 받아온 방 목록을 상태로 저장
+    } catch (error) {
+      console.error("Error fetching chat rooms:", error);
+    }
+  }, []);
+
+  // 방 생성 후 방 목록에 추가
+  const handleRoomCreation = (newRoom) => {
+    setRooms((prevRooms) => [...prevRooms, newRoom]); // 방 목록에 새 방 추가
   };
 
   return (
@@ -39,20 +55,20 @@ function App() {
             <Routes>
               <Route
                 path="/"
-                element={<ChatRoomList setSelectedRoom={setSelectedRoom} />}
+                element={<ChatRoomList rooms={rooms} fetchRooms={fetchRooms} />}
               />
               <Route
                 path="/create-room"
-                element={<CreateRoom userId={userId} />}
+                element={
+                  <CreateRoom user={user} onRoomCreated={handleRoomCreation} />
+                }
               />
               <Route
                 path="/room/:roomId"
                 element={
                   <ChatRoom
-                    username={username}
-                    userId={userId}
-                    selectedRoom={selectedRoom} // 선택된 방 전달
                     socket={socket} // 소켓 전달
+                    user={user}
                   />
                 }
               />

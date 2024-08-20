@@ -1,40 +1,25 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChatRoomListContainer,
   ChatRoomItem,
-  Loading,
   CreateRoomButtonContainer,
   CreateRoomButton,
 } from "./ChatRoomList.styles";
 
-function ChatRoomList({ setSelectedRoom }) {
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
+function ChatRoomList({ rooms, fetchRooms }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 서버에서 채팅방 목록을 가져오는 API 호출
-    const fetchRooms = async () => {
-      try {
-        // 환경변수로 백엔드 URL 사용
-        const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/room`
-        );
-        setRooms(response.data); // JSON 변환이 자동으로 처리됨
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching chat rooms:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchRooms();
-  }, []);
+    fetchRooms(); // 컴포넌트 마운트 시 방 목록 불러오기;
+  }, [fetchRooms]);
 
   const handleCreateRoom = () => {
-    navigate("/create-room"); // 채팅방 생성 페이지로 이동
+    navigate("/create-room");
+  };
+
+  const handleRoomClick = (room) => {
+    navigate(`/room/${room._id}`); // 해당 방으로 이동
   };
 
   return (
@@ -47,24 +32,19 @@ function ChatRoomList({ setSelectedRoom }) {
         </CreateRoomButton>
       </CreateRoomButtonContainer>
 
-      {loading ? (
-        <Loading>로딩 중...</Loading>
-      ) : (
-        <ul>
-          {rooms.map((room) => (
-            <Link
-              to={`/room/${room._id}`}
-              key={room._id}
-              style={{ textDecoration: "none" }}
-            >
-              <ChatRoomItem>
-                <span>{room.title}</span>
-                <span>참여자: {room.participants}</span>
-              </ChatRoomItem>
-            </Link>
-          ))}
-        </ul>
-      )}
+      <ul>
+        {rooms.map((room) => (
+          <ChatRoomItem
+            key={room._id}
+            onClick={() => handleRoomClick(room)}
+            style={{ cursor: "pointer" }}
+          >
+            <h3>{room.title}</h3>
+            <p>최대 인원: {room.max}</p>
+            <p>방장: {room.owner.name}</p>
+          </ChatRoomItem>
+        ))}
+      </ul>
     </ChatRoomListContainer>
   );
 }

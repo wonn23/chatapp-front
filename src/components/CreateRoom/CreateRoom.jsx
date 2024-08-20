@@ -8,7 +8,7 @@ import {
   Button,
 } from "./CreateRoom.styles";
 
-const CreateRoom = ({ userId }) => {
+const CreateRoom = ({ user, onRoomCreated }) => {
   const [title, setTitle] = useState("");
   const [max, setMax] = useState(10);
   const navigate = useNavigate();
@@ -22,10 +22,12 @@ const CreateRoom = ({ userId }) => {
         {
           title,
           max,
-          owner: userId, // 유저의 ObjectId를 owner로 설정
-          participants: [userId], // 참가자로도 owner 추가
+          owner: user._id, // 유저의 ObjectId를 owner로 설정
+          participants: [user._id], // 참가자로도 owner 추가
         }
       );
+      const newRoom = response.data;
+      onRoomCreated(newRoom);
 
       navigate(`/room/${response.data._id}`); // 방이 생성되면 해당 방으로 이동
     } catch (error) {
@@ -50,7 +52,7 @@ const CreateRoom = ({ userId }) => {
           value={max}
           onChange={(e) => setMax(e.target.value)}
           min="2"
-          max="100"
+          max="10"
           required
         />
         <Button type="submit">채팅방 생성</Button>
