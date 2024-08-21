@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { Input } from "@mui/base/Input";
-import { Button } from "@mui/base/Button";
+import { Input as MUIInput } from "@mui/base/Input";
+import { Button as MUIButton } from "@mui/base/Button";
 
 export const InputArea = styled.div`
   background-color: red;
@@ -9,9 +9,11 @@ export const InputArea = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
-  box-sizing: border-box;
+  right: 0;
+  padding: 0 0;
   align-items: center;
+  box-sizing: border-box;
+  border-top: 1px solid #ddd;
 `;
 
 export const PlusButton = styled.div`
@@ -24,41 +26,44 @@ export const PlusButton = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 24px;
-  box-sizing: border-box;
-  margin-right: 0px;
-  padding: 0px;
-  border: none;
+  cursor: pointer;
 `;
 
 export const InputContainer = styled.form`
   display: flex;
   justify-content: space-between;
-  width: calc(100% - 50px);
+  width: 100%;
   height: 100%;
-  padding: 0;
-  margin: 0;
 `;
 
-export const StyledInput = styled(Input)`
+export const StyledInput = styled(MUIInput)`
+  flex-grow: 1;
   height: 100%;
   width: 100%;
-  border: none;
   padding-left: 5px;
+  border: none;
+  background-color: white;
+  font-size: 16px;
+
+  &::before,
+  &::after {
+    display: none;
+  }
 
   &:focus {
     outline: none;
   }
 `;
-
-export const SendButton = styled(Button)`
+export const SendButton = styled(MUIButton)`
   min-width: 70px;
   height: 100%;
-  border-radius: 0;
   background-color: #f7e600;
   border: none;
+  font-weight: bold;
+  cursor: pointer;
 
   &:hover {
-    cursor: pointer;
+    background-color: #e6d500;
   }
 
   &:active {

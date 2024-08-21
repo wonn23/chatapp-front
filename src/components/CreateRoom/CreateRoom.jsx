@@ -6,7 +6,7 @@ import {
   FormContainer,
   Input,
   Button,
-} from "./CreateRoom.styles";
+} from "./CreateRoom.styles.jsx";
 
 const CreateRoom = ({ user, onRoomCreated }) => {
   const [title, setTitle] = useState("");

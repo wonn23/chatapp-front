@@ -1,35 +1,14 @@
 import React from "react";
-import styled from "styled-components";
+import {
+  MessageList,
+  MessageItem,
+  ProfileImage,
+  MessageText,
+} from "./MessageContainer.styles.jsx";
 import profileImg from "../../assets/profile.jpeg";
 
-const MessageList = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-`;
-
-const MessageItem = styled.div`
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-`;
-
-const ProfileImage = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-`;
-
-const MessageText = styled.div`
-  background-color: ${({ $isMyMessage }) =>
-    $isMyMessage ? "#f7e600" : "#eee"};
-  padding: 10px;
-  border-radius: 8px;
-  max-width: 60%;
-`;
-
 const MessageContainer = ({ messages = [], user }) => {
+  // 메시지가 없으면 아무것도 렌더링하지 않음
   if (!Array.isArray(messages) || messages.length === 0) {
     return null;
   }
@@ -37,22 +16,15 @@ const MessageContainer = ({ messages = [], user }) => {
   return (
     <MessageList>
       {messages.map((message, index) => {
-        const userExists = message.user && message.user.name;
-        const profilePicture =
-          userExists && message.user.profilePicture
-            ? message.user.profilePicture
-            : profileImg;
+        const messageUser = message.user || {};
+        const isMyMessage = messageUser._id === user._id;
 
         return (
           <MessageItem key={index}>
-            <ProfileImage src={profilePicture} alt="Profile" />
-            <MessageText
-              $isMyMessage={userExists && message.user._id === user._id}
-            >
-              <strong>
-                {userExists ? message.user.name : "Unknown User"}:{" "}
-              </strong>
-              {message.text}
+            <ProfileImage src={profileImg} alt="Profile" />
+            <MessageText $isMyMessage={isMyMessage}>
+              <strong>{messageUser.name || "Unknown"}: </strong>
+              {message.text || ""}
             </MessageText>
           </MessageItem>
         );

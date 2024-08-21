@@ -5,7 +5,7 @@ import {
   ChatRoomItem,
   CreateRoomButtonContainer,
   CreateRoomButton,
-} from "./ChatRoomList.styles";
+} from "./ChatRoomList.styles.jsx";
 
 function ChatRoomList({ rooms, fetchRooms }) {
   const navigate = useNavigate();
