@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const ChatRoom = ({ socket, user }) => {
-  const { roomId } = useParams(); // 방 ID를 URL에서 가져옴
+  const { roomId } = useParams();
   const [messages, setMessages] = useState([]);
   const [roomInfo, setRoomInfo] = useState(null);
 
@@ -17,7 +17,8 @@ const ChatRoom = ({ socket, user }) => {
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/room/${roomId}`
         );
-        setRoomInfo(response.data); // 방 정보 설정
+        console.log("fetchRoomInfo의 messages", response.data.messages);
+        setRoomInfo(response.data);
         setMessages(response.data.messages || []);
       } catch (error) {
         console.error("Failed to fetch room info", error);
@@ -29,21 +30,24 @@ const ChatRoom = ({ socket, user }) => {
     // 방에 입장
     socket.emit("joinRoom", roomId, (res) => {
       if (res.ok) {
-        console.log("joinRoom res.data", res.data);
+        console.log("joinRoom success:", res.data);
       } else {
-        console.error("JoinRoom error:", res.error);
+        console.error("joinRoom error:", res.error);
       }
     });
 
-    // 소켓을 통해 새 메시지를 수신
-    socket.on("roomMessages", (newMessage) => {
+    // 소켓 이벤트 핸들러 설정 (중복 방지)
+    const handleMessage = (newMessage) => {
+      console.log("서버로부터 브로드캐스트 받은 메시지:", newMessage); // 해당 메시지안에 user는 달랑 userId(ObjectId만 들어있다.)
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
+    };
 
+    socket.on("message", handleMessage);
+
+    // 컴포넌트 언마운트 시 이벤트 제거
     return () => {
-      // 방을 나가면 소켓 이벤트 해제
       socket.emit("leaveRoom", roomId);
-      socket.off("roomMessages");
+      socket.off("message", handleMessage); // 이벤트 핸들러 제거
     };
   }, [roomId, socket]);
 
@@ -58,10 +62,10 @@ const ChatRoom = ({ socket, user }) => {
 
     socket.emit("sendMessage", newMessage, (res) => {
       if (res.ok) {
+        console.log("클라이언트의 sendMessage:", newMessage);
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       } else {
         console.error("Message send failed:", res.error);
-        // navigate("/")가 호출되는 부분 확인
       }
     });
   };

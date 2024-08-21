@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const ChatRoomContainer = styled.div`
-  height: 95.5vh;
+  height: 97vh;
   background: #b6c6d7;
   margin-left: auto;
   margin-right: auto;
@@ -9,7 +9,10 @@ export const ChatRoomContainer = styled.div`
   position: relative;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 10px; /* 상단에만 패딩 적용 */
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
 `;
 
 export const ChatRoomHeader = styled.h2`
