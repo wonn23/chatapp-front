@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   MessageList,
   MessageItem,
@@ -14,8 +14,16 @@ const MessageContainer = ({ messages = [], user }) => {
     ? messages.slice(1)
     : messages;
 
+  const messageListRef = useRef(null);
+
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
-    <MessageList>
+    <MessageList ref={messageListRef}>
       {/* 이전 대화내용 렌더링 */}
       {previousMessages.map((prevMessage, index) => (
         <MessageItem
@@ -33,22 +41,21 @@ const MessageContainer = ({ messages = [], user }) => {
       ))}
 
       {/* 현재 대화내용 렌더링 */}
-      {currentMessages.map((message, index) => {
+      {currentMessages.map((currentMessage, index) => {
         // 유효하지 않은 메시지를 필터링
-        if (!message || !message.text || !message.user) {
+        if (!currentMessage || !currentMessage.text || !currentMessage.user) {
           return null;
         }
-
-        const isMyMessage = message.user._id === user._id;
+        const isMyMessage = currentMessage.user._id === user._id;
 
         return (
           <MessageItem key={`curr-${index}`} $isMyMessage={isMyMessage}>
-            {message.user._id !== user._id && (
+            {currentMessage.user._id !== user._id && (
               <ProfileImage src={profileImg} alt="Profile" />
             )}
             <MessageText $isMyMessage={isMyMessage}>
-              <strong>{message.user?.name || "Unknown"}: </strong>
-              {message.text}
+              <strong>{currentMessage.user?.name || "Unknown"}: </strong>
+              {currentMessage.text}
             </MessageText>
           </MessageItem>
         );
