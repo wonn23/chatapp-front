@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const ChatRoomContainer = styled.div`
-  height: 97vh;
+  height: 97.8vh;
   background: #b6c6d7;
   margin-left: auto;
   margin-right: auto;
